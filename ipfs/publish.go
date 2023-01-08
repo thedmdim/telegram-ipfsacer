@@ -45,17 +45,21 @@ func NewIPFSClient(url string, storage string, keyPath string) (*Client, error) 
 	return c, nil
 }
 
-// // return CID of whole dir
-// func (c *Client) CurrentStorage(ctx context.Context) (string, error) {
-// 	file, err := c.Sh.FilesStat(ctx, c.Storage)
-// 	if err != nil {
-//         return "", fmt.Errorf("cannot get cid of %s: %s", c.Storage, err)
-// 	}
+func (c *Client) PublishCurrent(ctx context.Context) (*shell.PublishResponse, error) {
+	file, err := c.Sh.FilesStat(ctx, c.Storage)
+	if err != nil {
+        return nil, fmt.Errorf("cannot get cid of %s: %s", c.Storage, err)
+	}
+	r, err := c.Sh.PublishWithDetails(file.Hash, c.KeyName, 0, 0, false)
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
+	
 
-// 	return file.Hash, nil
-// }
+}
 
-// create file /<Client.Storage>/<Video.Filename> and return current storage hash
+// create file /<Client.Storage>/<Video.Filename> and return files hash
 func (c *Client) AddVideo(ctx context.Context, v *video.Video) (string, error) {
 	
 	filename := path.Join(c.Storage, v.Filename)
@@ -67,11 +71,11 @@ func (c *Client) AddVideo(ctx context.Context, v *video.Video) (string, error) {
         return "", fmt.Errorf("cannot add: %s", err)
 	}
 
-	storage, err := c.Sh.FilesStat(ctx, c.Storage)
+	added, err := c.Sh.FilesStat(ctx, filename)
 	if err != nil {
         return "", fmt.Errorf("cannot get cid of %s: %s", filename, err)
 	}
 
-	return storage.Hash, nil
+	return added.Hash, nil
 
 }

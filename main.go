@@ -49,12 +49,21 @@ func main(){
 	if err != nil {
 		log.Fatalln(fmt.Errorf("cannot create IPFS client: %w", err))
 	}
+
+	// IPNS update every 24 hours
+
+	go func() {
+		for {
+			time.Sleep(time.Hour * 24)
+			Publish()
+		}
+	}()
 	
 	// event loop
 
 	for ;; {
 		updates, err := tg.Updates()
-		time.Sleep(time.Second)
+		time.Sleep(time.Minute)
 
 		if err != nil {
 			log.Println(err)
@@ -63,8 +72,6 @@ func main(){
 			log.Println("Process update")
 			processUpdate(&update)
 			tg.Offset = update.UpdateId + 1
-			
-			
 		}
 	}
 }
@@ -91,6 +98,7 @@ func processUpdate(result *telegram.Result){
 		log.Printf("cannot parse video id in %s", ytLink)
 		return
 	}
+	log.Printf("got youtube link %s", ytLink)
 
 	log.Printf("try get stream of %s", videoID)
 	vid, err := vid.Stream(videoID)
@@ -106,7 +114,7 @@ func processUpdate(result *telegram.Result){
 	}
 	log.Printf("added %s -> %s", vid.Filename, cid)
 
-	lines[len(lines)-1] = fmt.Sprintf("[youtube](https://www.youtube.com/watch?v=%s) | [ipfs](https://ipfs.io/ipfs/%s/%s)", videoID, cid, vid.Filename)
+	lines[len(lines)-1] = fmt.Sprintf("[youtube](https://www.youtube.com/watch?v=%s) | [ipfs](https://ipfs.io/ipfs/%s)", videoID, cid)
 
 	message := telegram.EditedPost{
 		Id: result.Post.Id,
@@ -117,13 +125,11 @@ func processUpdate(result *telegram.Result){
 
 	tg.EditMessage(message)
 
-	go func() {
-		_, err = c.Sh.PublishWithDetails(cid, c.KeyName, 0, 0, false)
-		if err != nil {
-			log.Println(err)
-		}
-		log.Println("IPNS updated with %s", cid)
-	}()
-
+	go Publish()
 }
 
+
+func Publish() {
+	r, _ := c.PublishCurrent(context.Background())
+	log.Printf("IPNS published %s -> %s", r.Value, r.Name)
+}
