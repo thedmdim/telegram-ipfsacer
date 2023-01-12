@@ -23,3 +23,5 @@ A Telegram bot to archive your YouTube videos to IPFS written in GO
 
 ## Host project is [MOV3371](https://t.me/mov3371)
 _a place where forgotten videos find a second life_
+
+wanna help - just pin something from [here](https://cloudflare-ipfs.com/ipns/k51qzi5uqu5di6sixp2l59em0ajrgzakb7p52s8qdgq5j1dolz4aubvdx869a0/)
