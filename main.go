@@ -16,11 +16,11 @@ import (
 var (
 	tgBotApiToken = flag.String("token", "", "the token for Telegram bot API")
 	tgChannel   = flag.String("channel", "", "the target Telegram cahnnel, example: @channelname")
-	ipfsNodeUrl = flag.String("url", "localhost:5001", "the IPFS node URL\ndefault: localhost:5001")
-	mfsDirName = flag.String("storage", "storage", "specify the dir name for all videos (optional)\ndefault: storage")
+	ipfsNodeUrl = flag.String("url", "localhost:5001", "the IPFS node URL")
+	mfsDirName = flag.String("storage", "storage", "specify the dir name for all videos (optional)")
 	keyPath = flag.String("key", "", "specify the path of IPNS key (optional)")
-	ipfsGateway = flag.String("ipfs-gateway", "ipfs.io", "specify public IPFS gateway (optional)\ndefault: ipfs.io")
-	ipnsUpdate = flag.Int("ipns-update", 24, "specify period in hours when IPNS will be updated \ndefault: 24")
+	ipfsGateway = flag.String("ipfs-gateway", "ipfs.io", "specify public IPFS gateway (optional)")
+	ipnsUpdate = flag.Int("ipns-update", 24, "specify period in hours when IPNS will be updated")
 )
 
 const tgBotApiUrl string = "https://api.telegram.org/bot"
@@ -34,7 +34,7 @@ func main(){
 
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
-		fmt.Fprintln(w, "Usage of go-ipfs-arch")
+		fmt.Fprintln(w, "Usage of TELEGRAM-IPFSACER")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -56,8 +56,8 @@ func main(){
 
 	go func() {
 		for {
-			time.Sleep(time.Hour * time.Duration(*ipnsUpdate))
 			Publish()
+			time.Sleep(time.Hour * time.Duration(*ipnsUpdate))
 		}
 	}()
 	
