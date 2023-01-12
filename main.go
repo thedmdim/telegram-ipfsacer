@@ -14,11 +14,13 @@ import (
 )
 
 var (
-	tgBotApiToken = flag.String("token", "", "specify the token for Telegram bot API")
-	tgChannel   = flag.String("channel", "", "specify the target Telegram cahnnel, example @channelname")
-	ipfsNodeUrl = flag.String("url", "localhost:5001", "specify the IPFS node URL, default localhost:5001")
-	mfsDirName = flag.String("storage", "storage", "specify the target Telegram cahnnel (optional)")
+	tgBotApiToken = flag.String("token", "", "the token for Telegram bot API")
+	tgChannel   = flag.String("channel", "", "the target Telegram cahnnel, example: @channelname")
+	ipfsNodeUrl = flag.String("url", "localhost:5001", "the IPFS node URL\ndefault: localhost:5001")
+	mfsDirName = flag.String("storage", "storage", "specify the dir name for all videos (optional)\ndefault: storage")
 	keyPath = flag.String("key", "", "specify the path of IPNS key (optional)")
+	ipfsGateway = flag.String("ipfs-gateway", "ipfs.io", "specify public IPFS gateway (optional)\ndefault: ipfs.io")
+	ipnsUpdate = flag.Int("ipns-update", 24, "specify period in hours when IPNS will be updated \ndefault: 24")
 )
 
 const tgBotApiUrl string = "https://api.telegram.org/bot"
@@ -40,7 +42,7 @@ func main(){
 	// some checks before start
 	if *tgBotApiToken == "" || *tgChannel == "" {
 		fmt.Println(tgBotApiToken, *tgChannel)
-		log.Fatalln("Set TGBOT_TOKEN and TG_CHANNEL env variables")
+		log.Fatalln("Please provide Telegram token, @channelname")
 	}
 
 	tg = telegram.NewClient(tgBotApiUrl, *tgBotApiToken)
@@ -54,7 +56,7 @@ func main(){
 
 	go func() {
 		for {
-			time.Sleep(time.Hour * 24)
+			time.Sleep(time.Hour * time.Duration(*ipnsUpdate))
 			Publish()
 		}
 	}()
@@ -114,7 +116,7 @@ func processUpdate(result *telegram.Result){
 	}
 	log.Printf("added %s -> %s", vid.Filename, cid)
 
-	lines[len(lines)-1] = fmt.Sprintf("[youtube](https://www.youtube.com/watch?v=%s) | [ipfs](https://ipfs.io/ipfs/%s)", videoID, cid)
+	lines[len(lines)-1] = fmt.Sprintf("[youtube](https://www.youtube.com/watch?v=%s) | [ipfs](https://%s/ipfs/%s)", videoID, *ipfsGateway, cid)
 
 	message := telegram.EditedPost{
 		Id: result.Post.Id,
