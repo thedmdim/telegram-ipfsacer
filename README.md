@@ -11,5 +11,15 @@ A Telegram bot to archive your YouTube videos to IPFS written in GO
 5. Edits post with link to added video
 6. Creates IPNS link ([example](https://cloudflare-ipfs.com/ipns/k51qzi5uqu5di6sixp2l59em0ajrgzakb7p52s8qdgq5j1dolz4aubvdx869a0/)) for whole storage to them all (for link to be static, use your own key)
 
+## Example start
+```bash
+./telegram-ipfsacer \
+    --token 5394987239:AAHHNHTQ4OFFENDpl7ypmMGe4U9kAeapopus \
+    --key mov3371.key \
+    --channel @mov3371 \
+    --url 127.0.0.1:5001 \
+    --ipns-update 6
+```
+
 ## Host project is [MOV3371](https://t.me/mov3371)
 _a place where forgotten videos find a second life_
